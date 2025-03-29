@@ -1,59 +1,59 @@
 # Claude PubMed Assistant
 
-一個將PubMed學術文獻搜索與Claude AI助手整合的簡單API服務。
+A simple API service integrating PubMed academic literature search with Claude AI assistant.
 
-## 🌟 功能特點
+## 🌟 Features
 
-- 🔍 快速搜索PubMed醫學文獻資料庫
-- 📊 獲取結構化JSON格式的研究文章資料
-- 📝 生成專為Claude優化的格式化輸出
-- 🌐 提供簡單的Web界面進行搜索
-- 🤖 為AI提示提供範本
-- 🔄 支持高級搜索參數（日期範圍、排序等）
+- 🔍 Quickly search the PubMed medical literature database
+- 📊 Get structured research article data in JSON format
+- 📝 Generate formatted output optimized for Claude
+- 🌐 Provide a simple web interface for searching
+- 🤖 Offer templates for AI prompts
+- 🔄 Support advanced search parameters (date ranges, sorting, etc.)
 
-## 🚀 快速開始
+## 🚀 Quick Start
 
-### 安裝
+### Installation
 
-1. 克隆此倉庫：
+1. Clone this repository:
 ```bash
 git clone https://github.com/yourusername/claude-pubmed-assistant.git
 cd claude-pubmed-assistant
 ```
 
-2. 安裝依賴：
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. 啟動服務器：
+3. Start the server:
 ```bash
 python run.py
 ```
 
-服務器將在 http://localhost:8000 啟動，並自動打開瀏覽器
+The server will start at http://localhost:8000 and automatically open in your browser
 
-### 使用方法
+### Usage
 
-#### 使用Web界面
+#### Using the Web Interface
 
-1. 打開瀏覽器，訪問 http://localhost:8000
-2. 輸入搜索詞，設置參數
-3. 點擊「搜索」按鈕
-4. 複製結果到Claude對話框
+1. Open your browser and visit http://localhost:8000
+2. Enter search terms and set parameters
+3. Click the "Search" button
+4. Copy the results to the Claude dialogue box
 
-#### 使用API
+#### Using the API
 
 ```python
 import requests
 import json
 
-# 基本搜索
+# Basic search
 response = requests.post('http://localhost:8000/api/search', 
                         json={'query': 'covid vaccine'})
 results = response.json()
 
-# 高級搜索
+# Advanced search
 response = requests.post('http://localhost:8000/api/search', 
                         json={
                             'query': 'stroke treatment',
@@ -63,102 +63,102 @@ response = requests.post('http://localhost:8000/api/search',
                         })
 results = response.json()
 
-# 獲取Claude優化格式
+# Get Claude-optimized format
 response = requests.post('http://localhost:8000/api/claude_format', 
                         json={
                             'query': 'diabetes management',
                             'max_results': 5
                         })
 claude_text = response.json()['formatted_text']
-print(claude_text)  # 複製到Claude對話框
+print(claude_text)  # Copy to Claude dialogue box
 ```
 
-## 📖 工作原理
+## 📖 How It Works
 
-1. 服務器接收搜索請求
-2. 使用PubMed E-utilities API查詢醫學文獻
-3. 解析結果為結構化資料
-4. 返回JSON或格式化的Markdown內容
-5. 用戶將結果提供給Claude進行分析和總結
+1. The server receives a search request
+2. It queries medical literature using the PubMed E-utilities API
+3. It parses the results into structured data
+4. It returns JSON or formatted Markdown content
+5. The user provides the results to Claude for analysis and summarization
 
-## 🧩 與Claude協作
+## 🧩 Collaborating with Claude
 
-最佳實踐：
+Best practices:
 
-1. 先搜索相關文獻
-2. 使用「Claude優化格式」功能
-3. 複製格式化結果到Claude對話框
-4. 為Claude提供明確指示，例如：
-   - "請分析這些關於心臟病治療的最新研究"
-   - "總結這些論文的主要發現和方法論"
-   - "比較這些不同研究的結果並解釋差異"
+1. First search for relevant literature
+2. Use the "Claude Optimized Format" feature
+3. Copy the formatted results to the Claude dialogue box
+4. Provide clear instructions to Claude, such as:
+   - "Please analyze these latest research studies on heart disease treatments"
+   - "Summarize the main findings and methodologies of these papers"
+   - "Compare the results of these different studies and explain the differences"
 
-查看 `examples/claude_prompt.md` 了解更多提示模板。
+See `examples/claude_prompt.md` for more prompt templates.
 
-## 🛠️ 進階配置
+## 🛠️ Advanced Configuration
 
-可在 `.env` 文件中設置以下選項：
+The following options can be set in the `.env` file:
 ```
-PUBMED_API_KEY=your_api_key_here  # 可選但建議
-HOST=0.0.0.0                      # 服務器主機
-PORT=8000                         # 服務器端口
-DEBUG=False                       # 生產環境應設為False
+PUBMED_API_KEY=your_api_key_here  # Optional but recommended
+HOST=0.0.0.0                      # Server host
+PORT=8000                         # Server port
+DEBUG=False                       # Should be False in production
 ```
 
-## 📋 API參考
+## 📋 API Reference
 
 ### `POST /api/search`
 
-參數：
-- `query` (必須): 搜索詞
-- `max_results` (可選, 默認=10): 最大結果數
-- `sort` (可選, 默認="relevance"): 排序方式 ("relevance" 或 "date")
-- `since_year` (可選): 僅顯示特定年份之後的結果
+Parameters:
+- `query` (required): Search terms
+- `max_results` (optional, default=10): Maximum number of results
+- `sort` (optional, default="relevance"): Sort method ("relevance" or "date")
+- `since_year` (optional): Only show results after a specific year
 
-返回：JSON格式的文章列表
+Returns: List of articles in JSON format
 
 ### `POST /api/claude_format`
 
-參數同上，返回：
-- `formatted_text`: 為Claude優化的Markdown格式文本
+Parameters same as above, returns:
+- `formatted_text`: Markdown formatted text optimized for Claude
 
 ### `GET /api/article/<pmid>`
 
-參數：
+Parameters:
 - `pmid`: PubMed ID
 
-返回：特定文章的詳細信息
+Returns: Detailed information about a specific article
 
-## 📚 依賴項
+## 📚 Dependencies
 
-本專案僅依賴三個主要套件：
-- Flask (Web框架)
-- httpx (非同步HTTP客戶端)
-- python-dotenv (環境變數管理)
+This project relies on only three main packages:
+- Flask (Web framework)
+- httpx (Asynchronous HTTP client)
+- python-dotenv (Environment variable management)
 
-## 🔄 疑難排解
+## 🔄 Troubleshooting
 
-如果遇到問題：
+If you encounter issues:
 
-1. **依賴錯誤**: 確保使用 `pip install -r requirements.txt` 安裝所有依賴項
-2. **連接錯誤**: 檢查網絡連接和PubMed API狀態
-3. **啟動失敗**: 檢查端口是否被占用，嘗試修改 `.env` 文件中的 PORT 設置
-4. **搜索結果為空**: 調整搜索詞，使用PubMed高級搜索語法 
+1. **Dependency errors**: Make sure you've installed all dependencies with `pip install -r requirements.txt`
+2. **Connection errors**: Check your network connection and the PubMed API status
+3. **Startup failures**: Check if the port is already in use and try modifying the PORT setting in the `.env` file
+4. **Empty search results**: Adjust your search terms and try using PubMed's advanced search syntax
 
-## 📜 許可證
+## 📜 License
 
 MIT
 
-## 🤝 貢獻
+## 🤝 Contributing
 
-歡迎提交Issue和Pull Request！
+Issues and Pull Requests are welcome!
 
-1. Fork此倉庫
-2. 創建功能分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 打開Pull Request
+1. Fork this repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📮 聯繫方式
+## 📮 Contact
 
-[你的郵箱或聯繫方式]
+[Your email or contact information]
