@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PubMed 搜索結果 - Claude PubMed 助手</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css">
+    <style>
+        body {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        .header {
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .main {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            color: #777;
+            border-top: 1px solid #e5e5e5;
+            text-align: center;
+        }
+        .article {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .article:last-child {
+            border-bottom: none;
+        }
+        .article-title {
+            margin-bottom: 0.5rem;
+        }
+        .article-meta {
+            margin-bottom: 0.5rem;
+            color: #6c757d;
+        }
+        .article-abstract {
+            margin-bottom: 1rem;
+        }
+        .article-links a {
+            margin-right: 1rem;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            white-space: pre-wrap;
+        }
+        .copy-btn {
+            position: sticky;
+            bottom: 20px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="container main">
+        <header class="header">
+            <div class="d-flex align-items-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/2936/2936826.png" alt="Logo" width="50" height="50" class="me-3">
+                <h1>Claude PubMed 助手</h1>
+            </div>
+            <p class="lead">PubMed 搜索結果: <strong>{{ query }}</strong></p>
+            <a href="/" class="btn btn-outline-secondary">返回搜索</a>
+        </header>
+
+        <main>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="card-title mb-0">搜索結果</h2>
+                        <button id="copyBtn" class="btn btn-success">複製到剪貼板</button>
+                    </div>
+                    
+                    {% if format_type == 'claude' %}
+                        <div class="alert alert-info mb-3">
+                            以下結果已格式化為 Claude 友好的 Markdown 格式。點擊「複製到剪貼板」按鈕，然後將內容粘貼到 Claude 對話框中。
+                        </div>
+                        <pre id="content-to-copy">{{ formatted_text }}</pre>
+                    {% else %}
+                        {% if results|length == 0 %}
+                            <div class="alert alert-warning">沒有找到匹配的結果。請嘗試使用不同的搜索詞。</div>
+                        {% else %}
+                            <div class="mb-3">共找到 {{ results|length }} 篇文章</div>
+                            <div id="content-to-copy">
+                                {% for article in results %}
+                                    <div class="article">
+                                        <h3 class="article-title">{{ article.title }}</h3>
+                                        <div class="article-meta">
+                                            <span class="journal">{{ article.journal }}</span>
+                                            {% if article.publication_date %}
+                                            | <span class="date">{{ article.publication_date }}</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if article.authors %}
+                                            <div class="article-authors mb-2">
+                                                <strong>作者:</strong> {{ article.authors|join(', ') }}
+                                            </div>
+                                        {% endif %}
+                                        {% if article.abstract %}
+                                            <div class="article-abstract">
+                                                <strong>摘要:</strong> {{ article.abstract }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="article-links">
+                                            <a href="{{ article.url }}" target="_blank" class="btn btn-sm btn-outline-primary">在 PubMed 查看</a>
+                                            {% if article.doi_url %}
+                                                <a href="{{ article.doi_url }}" target="_blank" class="btn btn-sm btn-outline-secondary">DOI: {{ article.doi }}</a>
+                                            {% endif %}
+                                            <span class="badge bg-secondary">PMID: {{ article.pmid }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">如何與 Claude 使用這些結果</h3>
+                    <ol>
+                        <li>點擊「複製到剪貼板」按鈕複製結果。</li>
+                        <li>將內容粘貼到 Claude 對話框中。</li>
+                        <li>提供明確的指示，例如：
+                            <ul>
+                                <li>"分析這些研究的主要方法和發現"</li>
+                                <li>"總結這些文獻中的關鍵趨勢"</li>
+                                <li>"對比不同研究的結果"</li>
+                                <li>"從這些論文中提取重要的臨床應用"</li>
+                            </ul>
+                        </li>
+                        <li>根據 Claude 的回覆提出後續問題以獲得更深入的見解。</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <button id="copyBtnBottom" class="btn btn-success btn-lg d-block mx-auto copy-btn">複製到剪貼板</button>
+        </main>
+
+        <footer class="footer">
+            <p>
+                Claude PubMed 助手 &copy; 2025 | 
+                <a href="https://github.com/yourusername/claude-pubmed-assistant" target="_blank">GitHub</a> |
+                使用 <a href="https://www.ncbi.nlm.nih.gov/books/NBK25500/" target="_blank">PubMed E-utilities API</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 複製到剪貼板功能
+        function copyToClipboard() {
+            const contentElement = document.getElementById('content-to-copy');
+            const content = contentElement.innerText || contentElement.textContent;
+            
+            navigator.clipboard.writeText(content).then(() => {
+                // 顯示成功提示
+                const buttons = document.querySelectorAll('.copy-btn, #copyBtn');
+                buttons.forEach(btn => {
+                    const originalText = btn.textContent;
+                    btn.textContent = '已複製！';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-info');
+                    
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.classList.remove('btn-info');
+                        btn.classList.add('btn-success');
+                    }, 2000);
+                });
+            }).catch(err => {
+                console.error('無法複製文本: ', err);
+                alert('複製失敗，請手動選擇內容並複製。');
+            });
+        }
+        
+        document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+        document.getElementById('copyBtnBottom').addEventListener('click', copyToClipboard);
+    </script>
+</body>
+</html>
